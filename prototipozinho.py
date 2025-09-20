@@ -9,21 +9,28 @@ SUPABASE_URL = 'https://adzsxryzybpuoowpeyjb.supabase.co'
 SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkenN4cnl6eWJwdW9vd3BleWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0MTc4OTcsImV4cCI6MjA3MTk5Mzg5N30.-vKcQWGX4zdRToU9EAtcuhS-dtx7xS2Q8OyIo5OMf8w'
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def login():
-    if 'logged_in' not in st.session_state:
-        st.session_state.logged_in = False
+def do_login():
+    response = supabase.auth.sign_in_with_password({"email": st.session_state.email, "password": st.session_state.password})
+    if response.user:
+        st.session_state.logged_in = True
+        st.session_state.user = response.user
+    else:
+        st.error('Usuário ou senha inválidos.')
 
-    st.title('Login no CliniTrials')
-    email = st.text_input('E-mail')
-    password = st.text_input('Senha', type='password')
-    login_button = st.button('Entrar')
-    if login_button:
-        response = supabase.auth.sign_in_with_password({"email": email, "password": password})
-        if response.user:
-            st.session_state.logged_in = True
-            st.session_state.user = response.user
-        else:
-            st.error('Usuário ou senha inválidos.')
+def login():
+    if 'email' not in st.session_state:
+        st.session_state.email = ""
+    if 'password' not in st.session_state:
+        st.session_state.password = ""
+
+    with st.form('login_form'):
+        st.text_input('E-mail', key='email')
+        st.text_input('Senha', type='password', key='password')
+        submitted = st.form_submit_button('Entrar', on_click=do_login)
+        
+    if st.session_state.get('logged_in'):
+        st.success("Logado com sucesso!")
+
 
 def logout():
     supabase.auth.sign_out()
