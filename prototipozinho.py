@@ -10,7 +10,9 @@ SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def login():
-    st.session_state.logged_in = False
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+
     st.title('Login no CliniTrials')
     email = st.text_input('E-mail')
     password = st.text_input('Senha', type='password')
@@ -20,7 +22,7 @@ def login():
         if response.user:
             st.session_state.logged_in = True
             st.session_state.user = response.user
-            st.experimental_rerun()
+            st.experimental_rerun()  # reinicia para atualizar estado
         else:
             st.error('Usuário ou senha inválidos.')
 
@@ -29,6 +31,7 @@ def logout():
     st.session_state.logged_in = False
     st.session_state.user = None
     st.experimental_rerun()
+
 
 def get_clinical_trials():
     response = supabase.from_('estudos_clinicos').select('*').order('created_at', desc=True).execute()
