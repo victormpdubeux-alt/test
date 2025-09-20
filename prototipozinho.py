@@ -36,7 +36,8 @@ def logout():
     supabase.auth.sign_out()
     st.session_state.logged_in = False
     st.session_state.user = None
-    st.experimental_rerun()
+    # Remover a chamada que causa erro
+    # st.experimental_rerun()
 
 
 def get_clinical_trials():
