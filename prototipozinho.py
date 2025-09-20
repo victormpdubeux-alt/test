@@ -22,7 +22,6 @@ def login():
         if response.user:
             st.session_state.logged_in = True
             st.session_state.user = response.user
-            st.experimental_rerun()  # reinicia para atualizar estado
         else:
             st.error('Usuário ou senha inválidos.')
 
